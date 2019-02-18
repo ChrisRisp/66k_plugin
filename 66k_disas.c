@@ -17,19 +17,59 @@ static void dp(char* str) {
         fclose(fp);
 }
 
+static int re_read_le24(char* str) {
+        int r = 0;
+        r += (str[2] << 16);
+        r += (str[1] << 8);
+        r += str[0];
+        return r;
+}
+
 static int disassemble(RAsm *a, RAsmOp *op, ut8 *buf, ut64 len) {
         char debugprintbuf[256];
-        dp("disassemble function called!\n");
-        snprintf(debugprintbuf, 256, "\tCPU: %s, Bits: %d, Big Endian: %d\n", a->cpu, a->bits, a->big_endian);
-        dp(debugprintbuf);
+	snprintf(debugprintbuf, 256, "\tBuffer (buf): %p, Length (len): %d\n", buf, len);
+	dp(debugprintbuf);
+
+	/* An instruction is always 4 bytes. Return if we don't get four bytes to read */
+	if(len < 4) {
+		return 0;
+	}
+	op->size=4; /* op code size 4 bytes */
+
+
+
+	//TODO Add entries for interrupt vectors
+	//TODO Make a queue for resolving these addreses to output
+	//TODO Start decoding
+
+	// Account for variable instruction size MAX of 6 bytes in length
+	
+
+	/*Fetch */
+	char opcode[6]; // 6 bytes MAX length
+	const char *buf_asm = "invalid";
+	memcpy(opcode, buf, 6);
+	
+	/* Temp Decode */
+	switch(opcode[0]) {
+                case 0x00:
+                        buf_asm = sdb_fmt("%d NOP", re_read_le24(opcode+1));
+                        r_strbuf_set(&op->buf_asm, buf_asm);
+			break;
+                default:
+			buf_asm = sdb_fmt("%s", "Invalid");
+                        r_strbuf_set(&op->buf_asm, buf_asm);
+                        break;
+        }
         return 4;
 }
 
-RAsmPlugin r_asm_plugin_myarch = {
-	.name = "66k Dissasembler",
+RAsmPlugin r_asm_plugin_66k = {
+	.name = "66k",
 	.desc = "disassembly plugin for OKI 66207",
-	.arch = "OKI66k",
-	.bits = 8|16, /* supported wordsizes */
+	.arch = "66k",
+	.bits = 8 | 16, /* supported wordsizes */
+	.endian = R_SYS_ENDIAN_LITTLE,
 	.init = NULL,
 	.fini = NULL,
 	.disassemble = &disassemble,
@@ -40,6 +80,6 @@ RAsmPlugin r_asm_plugin_myarch = {
 #ifndef CORELIB
 struct r_lib_struct_t radare_plugin = {
 	.type = R_LIB_TYPE_ASM,
-	.data = &r_asm_plugin_myarch
+	.data = &r_asm_plugin_66k
 };
 #endif

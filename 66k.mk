@@ -1,13 +1,15 @@
-OBJ_MYARCH=asm_myarch.o
-# myarch backend
-OBJ_MYARCH+=../arch/myarch/udis86/file1.o
-OBJ_MYARCH+=../arch/myarch/udis86/file2.o
-[...]
+## 66k Makefile
+OBJ_66k=asm_66k.o
+## 66k Backend
+OBJ_66k+=../arch/66k/66k_disas.o
+CFLAGS+=-I./arch/66k/
 
-STATIC_OBJ+=${OBJ_MYARCH}
-TARGET_MYARCH=asm_myarch.${EXT_SO}
+STATIC_OBJ+=${OBJ_66k}
+TARGET_66k=asm_66k.${EXT_SO}
 
-ALL_TARGETS+=${TARGET_MYARCH}
+ifeq ($(WITHPIC),1)
+ALL_TARGETS+=${TARGET_66k}
 
-${TARGET_MYARCH}: ${OBJ_MYARCH}
-	${CC} ${LDFLAGS} ${CFLAGS} -o ${TARGET_MYARCH} ${OBJ_MYARCH}
+${TARGET_66k}: ${OBJ_66k}
+	${CC} $(call libname,asm_66k) ${LDFLAGS} ${CFLAGS} -o ${TARGET_66k} ${OBJ_66k}
+endif

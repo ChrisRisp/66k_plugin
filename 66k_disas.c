@@ -3,6 +3,9 @@
 #include <r_types.h>
 #include <r_lib.h>
 #include <r_asm.h>
+
+#include "66k_ops.h"
+#include "66k_disas.h"
 // File Should be placed in libr/asm/p
 
 
@@ -25,26 +28,30 @@ static int re_read_le24(char* str) {
         return r;
 }
 
-static int disassemble(RAsm *a, RAsmOp *op, ut8 *buf, ut64 len) {
+static bool 66k_init (void* user) {
+	// Initialize interrupt vectors
+}
+
+
+static int 66k_disas(RAsm *a, RAsmOp *op, ut8 *buf, ut64 len) {
         char debugprintbuf[256];
 	snprintf(debugprintbuf, 256, "\tBuffer (buf): %p, Length (len): %d\n", buf, len);
 	dp(debugprintbuf);
 
-	/* An instruction is always 4 bytes. Return if we don't get four bytes to read */
-	if(len < 4) {
+
+	/* Determine size of instruction */
+	if(len <= 6) {
+		// Write backend code		
+	}else{
 		return 0;
 	}
-	op->size=4; /* op code size 4 bytes */
 
-
-
-	//TODO Add entries for interrupt vectors
-	//TODO Make a queue for resolving these addreses to output
-	//TODO Start decoding
+	//TODO Add entries for interrupt vectors (Call Init)
+	//TODO Make a queue for resolving handler addreses
+	//TODO Start decoding (ops.h)
 
 	// Account for variable instruction size MAX of 6 bytes in length
 	
-
 	/*Fetch */
 	char opcode[6]; // 6 bytes MAX length
 	const char *buf_asm = "invalid";
@@ -64,22 +71,3 @@ static int disassemble(RAsm *a, RAsmOp *op, ut8 *buf, ut64 len) {
         return 4;
 }
 
-RAsmPlugin r_asm_plugin_66k = {
-	.name = "66k",
-	.desc = "disassembly plugin for OKI 66207",
-	.arch = "66k",
-	.bits = 8 | 16, /* supported wordsizes */
-	.endian = R_SYS_ENDIAN_LITTLE,
-	.init = NULL,
-	.fini = NULL,
-	.disassemble = &disassemble,
-	.modify = NULL,
-	.assemble = NULL,
-};
-
-#ifndef CORELIB
-struct r_lib_struct_t radare_plugin = {
-	.type = R_LIB_TYPE_ASM,
-	.data = &r_asm_plugin_66k
-};
-#endif

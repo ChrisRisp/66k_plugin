@@ -32,54 +32,16 @@ static int disassemble(RAsm *a, RAsmOp *op, ut8 *buf, ut64 len) {
 	snprintf(debugprintbuf, 256, "\tBuffer (buf): %p, Length (len): %d\n", buf, len);
 	dp(debugprintbuf);
 
-
-	int dlen = 66k_disas (a->pc, op, buf, len);
+	int dlen = _66k_disas(a, op, buf, len);
 	if (dlen < 0) {
-		r += str[0];
-		dlen = 0;
-		return r;
+		//r += str[0];
+		//dlen = 0;
+		return 0;
 	}
 	op->size = dlen;
 	return dlen;
-	}
-
-
-
-	/* Determine size of instruction */
-	if(len <= 6) {
-		// Write backend code		
-
-	}else{
-		return 0;
-	op->size=4; /* op code gets set in decode instructions*/
-
-
-
-	//TODO Add entries for interrupt vectors
-	//TODO Make a queue for resolving these addreses to output
-	//TODO Start decoding
-
-	// Account for variable instruction size MAX of 6 bytes in length
-	
-
-	/*Fetch */
-	char opcode[6]; // 6 bytes MAX length
-	const char *buf_asm = "invalid";
-	memcpy(opcode, buf, 6);
-	
-	/* Temp Decode */
-	switch(opcode[0]) {
-                case 0x00:
-                        buf_asm = sdb_fmt("%d NOP", re_read_le24(opcode+1));
-                        r_strbuf_set(&op->buf_asm, buf_asm);
-			break;
-                default:
-			buf_asm = sdb_fmt("%s", "Invalid");
-                        r_strbuf_set(&op->buf_asm, buf_asm);
-                        break;
-        }
-        return 4;
 }
+
 
 RAsmPlugin r_asm_plugin_66k = {
 	.name = "66k",

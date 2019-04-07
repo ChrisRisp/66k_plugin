@@ -113,8 +113,9 @@ const char *DASMOutput::get_label(unsigned addr)
 */
 const char *get_romtable_label(unsigned addr)
 {
+
+        static char lbuf[64];
 /*
-        static char lbuf1[64], lbuf2[64];
         static char *lbuf=lbuf2;
         lbuf = (lbuf == lbuf1) ? lbuf2 : lbuf1;
         if(!_dout->ignore(addr) &&  
@@ -128,7 +129,8 @@ const char *get_romtable_label(unsigned addr)
         sprintf(lbuf, "0%04xh", addr);
         return lbuf;
 */
-	return 0;
+        sprintf(lbuf, "0%04xh", addr);
+        return lbuf;
 }
 
 
